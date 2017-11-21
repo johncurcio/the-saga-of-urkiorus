@@ -1,17 +1,37 @@
 import pygame
 from background import Background
 from option import Option
+from intro import Intro
+from fader import Fader
 from constants import *
+
+BackGround = Background(BACKGROUND_INTRO, BACKGROUND_INTRO_POS)
+sound1 = Fader(MAIN_MENU_SONG)
+sound2 = Fader(INTRO_SONG)
+
+def game_intro():
+    screen.fill(RGB_BLACK) #DRAWS MENU
+    pygame.display.update()
+    sound1.sound.set_volume(0)
+    pygame.time.wait(100)
+    sound2.sound.play()
+    text = """[i] Initializing ...
+[i] Entering ghost mode ...
+
+done ..."""
+    Intro(screen, text).run()
+    Intro(screen, "End.", False).run()
 
 
 def game_loop():
     game_exit = False
+    game_intro() 
     while not game_exit:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-
+               
         pygame.display.update()
         clock.tick(FPS)
 
@@ -28,16 +48,14 @@ def draw_menu(options):
             option.hovered = False
         option.draw()
 
-def game_intro():
+def game_menu(options):
     intro = True
-    pygame.mixer.music.load(MAIN_MENU_SONG)
-    pygame.mixer.music.play(-1)
+    sound1.sound.play()
     while intro:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-        BackGround = Background(BACKGROUND_INTRO, BACKGROUND_INTRO_POS)
         screen.blit(BackGround.image, BackGround.rect)
         largeText = pygame.font.Font(FONT_INTRO,FONT_INTRO_SIZE)
         TextSurf, TextRect = text_objects(GAME_TITLE, largeText)
@@ -60,4 +78,4 @@ if __name__ == "__main__":
     options = [Option("new game",  (320, 300), menu_font, screen, game_loop), 
                Option("load game", (320, 350), menu_font, screen),
                Option("quit",      (320, 400), menu_font, screen, quit_game)]
-    game_intro()
+    game_menu(options)
